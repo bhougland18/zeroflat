@@ -1,0 +1,30 @@
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
+
+# Flutter / Dart
+.dart_tool/
+.packages
+build/
+pubspec.lock
+*.iml
+
+# Writable Flutter SDK mirror (created by scripts/bootstrap-dev-workspace.sh)
+.cache/
+
+# Rust
+/target/
+
+# FlatBuffers generated code — regenerate with `just codegen`
+# (native/src/generated/mod.rs is hand-written and NOT ignored)
+lib/src/generated/*.dart
+native/src/generated/zeroflat_generated.rs
+
+# packages/zeroflat_forui
+packages/zeroflat_forui/.dart_tool/
+packages/zeroflat_forui/.packages
+packages/zeroflat_forui/build/
+packages/zeroflat_forui/pubspec.lock
+packages/zeroflat_forui/*.iml

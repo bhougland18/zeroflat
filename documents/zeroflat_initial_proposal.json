@@ -1,0 +1,29 @@
+{
+  "title": "ZeroFlat – Rust + Rinf + FlatBuffers + Forui SDUI",
+  "tagline": "Zero logic frontend. Zero hand-written FlatBuffers. Zero unnecessary abstraction.",
+  "goal": "Rust owns logic, rules, state, and AI design. Flutter is a thin, delightful renderer using Forui. ID-based deltas for Patrol. Instant theming. AI turns natural language + coordinates into production forms.",
+  "philosophy": [
+    "Rust = Brain (speed, safety, Conduit rules, AI orchestration)",
+    "Flutter = Canvas (Forui polish, gestures, themes, Lens overlay)",
+    "FlatBuffers = Efficient neutral contract",
+    "AI = Designer (you describe; it iterates)"
+  ],
+  "sections": {
+    "1_form_handling": "1. Rust sends full UIMessage with root + current values. 2. Flutter uses local controllers / Forui hooks (native typing). 3. On blur or debounce each component sends its own update to Rust. 4. Rust updates canonical state → runs Conduit rules → sends only affected deltas. 5. Flutter applies deltas by ID.",
+    "2_rinf_signals": "Dart: SendFieldUpdate, SendAction, SendDesignCommand. Rust: SendUiUpdate for FlatBuffer payloads.",
+    "3_flatbuffers": "UIComponent with required id, type, props, children; Delta with target_id; UIMessage.",
+    "4_renderer": "Use HookWidget for form fields. Thin mapping layer (buildForuiComponent) that turns semantic types into Forui widgets with ValueKey(id) for Patrol.",
+    "5_themes": "AppThemeProvider with ValueNotifier<FThemeData> + FTheme wrapper. Switch themes instantly. CLI-generated themes.",
+    "6_ai_design": "Pure-text first. Folder: design_ideas/idea_01.txt with natural language + optional coordinates. Watcher → LLM → FlatBuffer/deltas → render. Lens overlay: grid + hover IDs + command bar.",
+    "7_testing": "Reuse Forui widget tests. ID-based Patrol finders. Layers: low-level (Forui), component mappings, integration (Patrol), AI validation (schema + rules). Lens for exploratory testing.",
+    "8_effort": "Week 1: core renderer + forms. Week 2: themes + Conduit. Week 3: AI watcher + Lens."
+  },
+  "benefits": [
+    "Logic in Rust (speed + safety)",
+    "Near-zero abstraction cost",
+    "Full Flutter cross-platform reach",
+    "Server-driven / offline-first capable",
+    "AI-generative UI with iterative Lens feedback"
+  ],
+  "conclusion": "Forward-looking break from traditional heavy UI baggage while keeping what adds value."
+}

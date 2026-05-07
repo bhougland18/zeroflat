@@ -1,0 +1,44 @@
+{
+    "title": "Product Requirements Document (PRD) \u2013 ZeroFlat",
+    "version": "1.1",
+    "date": "May 2026",
+    "status": "Refined \u2013 Aligned on Postcard/GuardianDB Stack",
+    "vision": "A local-first, offline-capable application for body asymmetry and mental-state tracking. It utilizes a unified Rust core, Flutter frontend, and P2P synchronization via GuardianDB (Iroh/Willow). The system prioritizes Postcard for all serialization to ensure maximum efficiency and architectural homogeneity.",
+    "objectives": [
+        "Offline-first with P2P synchronization as the primary data path",
+        "Unified serialization strategy using Postcard across DB, P2P, and UI Bridge",
+        "Zero-knowledge multi-device identity via Iroh Ed25519 keys",
+        "Fast, local full-text search via FrankenSQLite (FTS5)",
+        "SDUI (Server-Driven UI) orchestrated by the Conduit FBP engine",
+        "Separate analysis app for RDF/SPARQL reasoning via Kolibrie"
+    ],
+    "architectural_updates": {
+        "serialization": "Postcard (replaces FlatBuffers). Used for GuardianDB storage, Iroh/Willow wire format, and Rinf binary signals.",
+        "p2p_engine": "GuardianDB (utilizing Iroh-Docs/Willow for sync, Iroh-Blobs for data, and Iroh-Gossip for signals).",
+        "ui_bridge": "Rinf using RustSignalBinary/DartSignalBinary traits for zero-copy Postcard transfer.",
+        "orchestration": "Conduit FBP (Rust-based) acting as the single source of truth for data flow and UI state."
+    },
+    "high_level_requirements": [
+        "Use Conduit for all logic orchestration between Flutter and Rust",
+        "Implement GuardianDB as the local-first storage and P2P replication layer",
+        "Utilize Postcard for all data structures to ensure compatibility with GuardianDB internals",
+        "Provide QR-based key export (encrypted Ed25519) for multi-device linking",
+        "Maintain a separate RDF analysis path where Postcard blobs are mapped to Kolibrie triples"
+    ],
+    "functional_requirements": {
+        "F1": "Incremental form editing: Tap events processed as CRDT ops in Rust, buffered before GuardianDB commit.",
+        "F2": "Completed forms stored as Postcard blobs in GuardianDB.",
+        "F3": "Immutable event log (GuardianDB internal) preserved for historical analysis.",
+        "F4": "Local FTS5 search: Rust-side indexer derives searchable text from Postcard blobs into FrankenSQLite.",
+        "F5": "Background P2P sync via Iroh Magicsock (handling NAT traversal/roaming).",
+        "F6": "SDUI: UI layouts defined in Rust (Postcard), rendered in Flutter via Rinf binary signals.",
+        "F7": "Update Mechanism: Signed delta updates delivered via Iroh Blobs and handled by Conduit."
+    },
+    "non_functional_requirements": {
+        "performance": "Sub-100ms UI response; zero-copy binary transfer across the Rinf bridge.",
+        "homogeneity": "Single serialization format (Postcard) across the entire stack to reduce architectural debt.",
+        "security": "E2EE via Iroh/Willow; at-rest encryption (XChaCha20-Poly1305) using OS keyring.",
+        "scalability": "Efficiently handles 1k-3k forms per client with low memory overhead."
+    },
+    "data_flow": "Flutter (User Input) -> Rinf (Binary Signal) -> Conduit (Logic/FBP) -> GuardianDB (Postcard Blob + CRDT Sync) -> Iroh/Willow (P2P Wire) -> Analysis App (Postcard -> RDF Mapper -> Kolibrie)."
+}

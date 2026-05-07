@@ -1,0 +1,3 @@
+app_id: dev.zeroflat.app
+# Run integration tests against the Linux desktop target (no emulator needed).
+# Usage: patrol test -d linux

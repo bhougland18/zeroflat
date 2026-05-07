@@ -1,0 +1,250 @@
+// zeroflat.fbs — source of truth for the Rust↔Dart UI bridge.
+//
+// IMPORTANT: every component table carries `id: string (required)`.
+// This id is the stable Patrol finder — it maps to ValueKey(id) in Flutter
+// and must be identical across re-renders of the same logical component.
+//
+// Ordering note: `union StacNode` is declared before its member tables so
+// component tables can reference it without a forward reference to a union
+// (FlatBuffers resolves forward refs to tables but not to unions).
+//
+// Codegen (run inside `nix develop`):
+//   just codegen
+//     → flatc --dart  -o lib/src/generated/  schema/zeroflat.fbs
+//     → flatc --rust  -o native/src/generated/ schema/zeroflat.fbs
+
+namespace zeroflat;
+
+// ── Primitive enums ───────────────────────────────────────────────────────────
+
+enum Brightness   : ubyte { Light = 0, Dark }
+enum Axis         : ubyte { Horizontal = 0, Vertical }
+enum ButtonVariant: ubyte { Primary = 0, Secondary, Outline, Destructive, Ghost }
+enum ButtonSize   : ubyte { Xs = 0, Sm, Md, Lg }
+enum ToastVariant : ubyte { Primary = 0, Destructive }
+enum SheetSide    : ubyte { Top = 0, Bottom, Left, Right }
+
+enum ColorToken : ubyte {
+  Primary = 0,
+  PrimaryForeground,
+  Secondary,
+  SecondaryForeground,
+  Muted,
+  MutedForeground,
+  Destructive,
+  DestructiveForeground,
+  Error,
+  ErrorForeground,
+  Background,
+  Foreground,
+  Card,
+  Border,
+  Barrier,
+}
+
+enum TypographyToken : ubyte {
+  Xs3 = 0, Xs2, Xs, Sm, Md, Lg,
+  Xl, Xl2, Xl3, Xl4, Xl5, Xl6, Xl7, Xl8,
+}
+
+// ── Shared value type ─────────────────────────────────────────────────────────
+
+// Table (not struct) so the field is an optional reference — absent = no padding.
+table EdgeInsets {
+  top:float;
+  right:float;
+  bottom:float;
+  left:float;
+}
+
+// ── Node union — declared here so component tables below can reference it ─────
+// Member tables are defined further down; FlatBuffers resolves table forward refs.
+
+union StacNode {
+  Theme,
+  Scaffold,
+  Header,
+  Divider,
+  Button,
+  TextField,
+  Switch,
+  Checkbox,
+  Card,
+  Dialog,
+}
+
+// Dart's FlatBuffers codegen does not support vectors of unions ([StacNode]).
+// NodeSlot is a one-field wrapper table so Header.suffixes, Header.actions,
+// and Dialog.actions can be [NodeSlot] — vectors of tables — instead.
+table NodeSlot {
+  node:StacNode;
+}
+
+// ── Action tables ─────────────────────────────────────────────────────────────
+
+table ActionUpdateState {
+  key:string (required);   // RDF predicate or KV path; Rust defines the key space.
+  value:string;            // Serialised value; type is determined by the Rust schema.
+}
+
+table ActionNavigate {
+  route:string (required);
+  args:string;             // OpaqueJson escape hatch — prefer typed Conduit messages.
+}
+
+table ToastConfig {
+  title:string (required);
+  description:string;
+  variant:ToastVariant = Primary;
+}
+
+// Overlay actions carry pre-serialised StacRoot bytes rather than an inline
+// StacNode. This avoids a StacAction ↔ StacNode circular union dependency.
+// Flutter parses the bytes with getRootAsStacRoot() and presents the result
+// as a modal overlay — identical to how a top-level UiUpdate is handled.
+table ActionShowDialog {
+  dialog_fbs:[ubyte] (required);
+}
+
+table ActionShowSheet {
+  side:SheetSide = Bottom;
+  sheet_fbs:[ubyte] (required);
+}
+
+table ActionShowToast {
+  toast:ToastConfig (required);
+}
+
+table ActionCustom {
+  name:string (required);
+  payload:string;          // OpaqueJson escape hatch.
+}
+
+union StacAction {
+  ActionUpdateState,
+  ActionNavigate,
+  ActionShowDialog,
+  ActionShowSheet,
+  ActionShowToast,
+  ActionCustom,
+}
+
+// ── Component tables ──────────────────────────────────────────────────────────
+//
+// Every table carries `id: string (required)` — the stable Patrol finder.
+// Field ordering: required strings first, optional strings, sub-nodes, scalars.
+
+table Theme {
+  id:string (required);
+  child:StacNode;
+  brightness:Brightness = Light;
+  border_radius:float;
+  border_width:float;
+  touch:bool = true;
+}
+
+table Scaffold {
+  id:string (required);
+  header:StacNode;
+  content:StacNode;
+  footer:StacNode;
+  background_color:ColorToken = Background;
+}
+
+table Header {
+  id:string (required);
+  title:string;
+  title_node:StacNode;
+  suffixes:[NodeSlot];
+  actions:[NodeSlot];
+}
+
+table Divider {
+  id:string (required);
+  axis:Axis = Horizontal;
+  color:ColorToken = Border;
+  thickness:float = 1.0;
+  padding:EdgeInsets;
+}
+
+table Button {
+  id:string (required);
+  label:string;
+  child:StacNode;
+  prefix_icon:StacNode;
+  suffix_icon:StacNode;
+  variant:ButtonVariant = Primary;
+  size:ButtonSize = Md;
+  on_press:StacAction;
+}
+
+table TextField {
+  id:string (required);
+  label:string;
+  description:string;
+  hint:string;
+  error:string;
+  value:string;            // Current text — renderer sets controller initial value; local edits take over after first render.
+  prefix:StacNode;
+  suffix:StacNode;
+  obscure_text:bool = false;
+  on_change:StacAction;
+  on_submit:StacAction;
+}
+
+table Switch {
+  id:string (required);
+  label:string;
+  description:string;
+  value:bool = false;
+  enabled:bool = true;
+  on_change:StacAction;
+  semantic_label:string;
+}
+
+table Checkbox {
+  id:string (required);
+  label:string;
+  description:string;
+  error:string;
+  value:bool = false;
+  enabled:bool = true;
+  leading_label:bool = false;
+  on_change:StacAction;
+  semantic_label:string;
+}
+
+table Card {
+  id:string (required);
+  title:string;
+  title_node:StacNode;
+  subtitle:string;
+  subtitle_node:StacNode;
+  child:StacNode;
+}
+
+table Dialog {
+  id:string (required);
+  actions:[NodeSlot];
+  title:string;
+  title_node:StacNode;
+  body:string;
+  body_node:StacNode;
+  axis:Axis = Vertical;
+}
+
+// ── Bridge envelopes ───────────────────────────────────────────────────────────
+//
+// Rust → Dart:  UiUpdate signal carries a StacRoot FlatBuffer.
+// Dart → Rust:  UiAction signal carries a UiActionEnvelope FlatBuffer.
+
+table StacRoot {
+  schema_version:ushort = 1;
+  node:StacNode;
+}
+
+table UiActionEnvelope {
+  action:StacAction;
+}
+
+root_type StacRoot;

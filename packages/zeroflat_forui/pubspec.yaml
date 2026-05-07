@@ -1,0 +1,19 @@
+name: zeroflat_forui
+description: "Forui component builders for the zeroflat stateless UI renderer."
+version: 0.0.1
+
+environment:
+  sdk: ^3.11.4
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  zeroflat:
+    path: ../..
+  forui: ^0.21.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

@@ -1,0 +1,25 @@
+name: zeroflat
+description: "Stateless Flutter UI renderer — turns FlatBuffer trees from Rust into Forui widgets via Rinf."
+version: 0.0.1
+homepage:
+
+environment:
+  sdk: ^3.11.4
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flat_buffers: ^23.5.26
+  rinf: ^8.10.0
+  tuple: ^2.0.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  patrol: ^4.0.0
+
+flutter:

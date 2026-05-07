@@ -1,0 +1,11 @@
+[package]
+name = "hub"
+version = "0.0.1"
+edition = "2021"
+
+[dependencies]
+flatbuffers = "25.2.10"
+rinf = "8.10.0"
+serde = { version = "1.0", features = ["derive"] }
+tokio = { version = "1", features = ["full"] }
+zeroflat-fbs = { path = ".." }
