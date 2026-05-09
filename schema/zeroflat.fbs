@@ -26,6 +26,7 @@ enum SheetSide    : ubyte { Top = 0, Bottom, Left, Right }
 enum BadgeVariant : ubyte { Primary = 0, Secondary, Outline, Destructive }
 enum AlertVariant : ubyte { Primary = 0, Destructive }
 enum SelectGroupVariant : ubyte { Checkbox = 0, Radio }
+enum CellType : ubyte { Text = 0, Int, Float, Bool, Date, Null }
 
 enum ColorToken : ubyte {
   Primary = 0,
@@ -83,6 +84,8 @@ union StacNode {
   SelectGroup,
   Accordion,
   Breadcrumb,
+  VirtualList,
+  WebView,
 }
 
 // Dart's FlatBuffers codegen does not support vectors of unions ([StacNode]).
@@ -132,6 +135,14 @@ table ActionCustom {
   payload:string;          // OpaqueJson escape hatch.
 }
 
+// Sent by Flutter when the user scrolls outside the current VirtualList window.
+// Rust responds with a new UiUpdate carrying the requested window.
+table ActionRequestWindow {
+  list_id:string (required);
+  offset:uint64;
+  size:uint = 100;
+}
+
 union StacAction {
   ActionUpdateState,
   ActionNavigate,
@@ -139,6 +150,7 @@ union StacAction {
   ActionShowSheet,
   ActionShowToast,
   ActionCustom,
+  ActionRequestWindow,
 }
 
 // ── Component tables ──────────────────────────────────────────────────────────
@@ -340,6 +352,52 @@ table BreadcrumbItem {
 table Breadcrumb {
   id:string (required);
   items:[BreadcrumbItem] (required);
+}
+
+// ── VirtualList — windowed lazy rendering for large datasets ──────────────────
+//
+// Rust sends total_rows + a small window of rows (~100–500). Flutter renders a
+// ListView.builder(itemCount: total_rows); when the scroll position approaches
+// the window boundary it dispatches ActionRequestWindow and Rust replies with
+// a new UiUpdate containing the next window. Columns are derived from the Arrow
+// schema on the Rust side — CellType carries the type hint Flutter needs for
+// alignment and formatting.
+
+table ColumnDef {
+  key:string (required);    // Arrow field name; maps to ValueKey on the cell.
+  label:string;             // Display header. Defaults to key if absent.
+  type:CellType = Text;
+  width:float;              // Logical pixels; 0.0 = auto.
+}
+
+table ListCell {
+  type:CellType = Text;
+  value:string;             // Always string-encoded. CellType drives alignment/formatting.
+}
+
+table ListRow {
+  id:string (required);     // Stable row identity — typically the primary key.
+  cells:[ListCell] (required);
+}
+
+table VirtualList {
+  id:string (required);
+  total_rows:uint64;        // Full result-set size for ListView.builder itemCount.
+  columns:[ColumnDef] (required);
+  window_start:uint64;      // Row offset of the first entry in `rows`.
+  rows:[ListRow] (required);
+  row_height:float;         // 0.0 = variable height (slightly less efficient).
+}
+
+// ── WebView — embeds a web view at the given URL ──────────────────────────────
+//
+// Intended for panels backed by a local server (e.g. perspective-server for
+// Arrow/DataFusion analytics). The Rust side starts the server, resolves the
+// URL, and sends this node; Flutter renders webview_flutter pointed at it.
+
+table WebView {
+  id:string (required);
+  url:string (required);
 }
 
 // ── Bridge envelopes ───────────────────────────────────────────────────────────
