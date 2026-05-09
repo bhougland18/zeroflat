@@ -9,11 +9,6 @@ codegen:
   flatc --rust -o native/src/generated schema/*.fbs
   @echo "== Codegen complete =="
 
-# Install Dart/Flutter dependencies for all packages
-deps:
-  flutter pub get
-  flutter pub get --directory packages/zeroflat_forui
-
 # Check Rust workspace
 check:
   cargo check --workspace
@@ -22,13 +17,21 @@ check:
 test-rust:
   cargo test --workspace
 
-# Run Flutter tests (all packages)
+# Run Flutter tests
 test-dart:
   flutter test
   flutter test packages/zeroflat_forui
 
 # Run all tests
 test: test-rust test-dart
+
+# Build the example app for Linux
+build-example:
+  cd example && flutter build linux --debug
+
+# Run the example app (requires a device/emulator)
+run-example:
+  cd example && flutter run
 
 # Format all code
 fmt:

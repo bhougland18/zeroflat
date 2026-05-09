@@ -1,8 +1,10 @@
 import 'package:forui/forui.dart';
 import 'package:zeroflat/src/fbs.dart' as fbs;
 
+typedef FThemePalette = ({FPlatformThemeData dark, FPlatformThemeData light});
+
 class ZeroFlatThemeRegistry {
-  static final Map<String, FPlatformThemeData> _palettes = {
+  static final Map<String, FThemePalette> _palettes = {
     'neutral': FThemes.neutral,
     'zinc': FThemes.zinc,
     'slate': FThemes.slate,
@@ -22,7 +24,7 @@ class ZeroFlatThemeRegistry {
     _activePalette = name;
   }
 
-  static void registerPalette(String name, FPlatformThemeData palette) {
+  static void registerPalette(String name, FThemePalette palette) {
     _palettes[name] = palette;
   }
 

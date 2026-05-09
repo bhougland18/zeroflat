@@ -1,6 +1,12 @@
 import 'package:zeroflat/src/action_dispatcher.dart';
 import 'package:zeroflat/src/fbs.dart' as fbs;
 import 'package:zeroflat/src/renderer.dart';
+import 'package:zeroflat_forui/src/builders/accordion_builder.dart';
+import 'package:zeroflat_forui/src/builders/alert_builder.dart';
+import 'package:zeroflat_forui/src/builders/avatar_builder.dart';
+import 'package:zeroflat_forui/src/builders/badge_builder.dart';
+import 'package:zeroflat_forui/src/builders/breadcrumb_builder.dart';
+import 'package:zeroflat_forui/src/builders/progress_builder.dart';
 import 'package:zeroflat_forui/src/builders/button_builder.dart';
 import 'package:zeroflat_forui/src/builders/card_builder.dart';
 import 'package:zeroflat_forui/src/builders/checkbox_builder.dart';
@@ -8,7 +14,10 @@ import 'package:zeroflat_forui/src/builders/dialog_builder.dart';
 import 'package:zeroflat_forui/src/builders/divider_builder.dart';
 import 'package:zeroflat_forui/src/builders/header_builder.dart';
 import 'package:zeroflat_forui/src/builders/scaffold_builder.dart';
+import 'package:zeroflat_forui/src/builders/select_group_builder.dart';
+import 'package:zeroflat_forui/src/builders/slider_builder.dart';
 import 'package:zeroflat_forui/src/builders/switch_builder.dart';
+import 'package:zeroflat_forui/src/builders/tabs_builder.dart';
 import 'package:zeroflat_forui/src/builders/text_field_builder.dart';
 import 'package:zeroflat_forui/src/builders/theme_builder.dart';
 import 'package:zeroflat_forui/src/overlays.dart';
@@ -43,6 +52,24 @@ class ZeroFlatForui {
         (ctx, m) => CardBuilder.build(ctx, m as fbs.Card));
     ZeroFlatRenderer.register(fbs.StacNodeTypeId.Dialog,
         (ctx, m) => DialogBuilder.build(ctx, m as fbs.Dialog));
+    ZeroFlatRenderer.register(fbs.StacNodeTypeId.Badge,
+        (ctx, m) => BadgeBuilder.build(ctx, m as fbs.Badge));
+    ZeroFlatRenderer.register(fbs.StacNodeTypeId.Avatar,
+        (ctx, m) => AvatarBuilder.build(ctx, m as fbs.Avatar));
+    ZeroFlatRenderer.register(fbs.StacNodeTypeId.Progress,
+        (ctx, m) => ProgressBuilder.build(ctx, m as fbs.Progress));
+    ZeroFlatRenderer.register(fbs.StacNodeTypeId.Tabs,
+        (ctx, m) => TabsBuilder.build(ctx, m as fbs.Tabs));
+    ZeroFlatRenderer.register(fbs.StacNodeTypeId.Slider,
+        (ctx, m) => SliderBuilder.build(ctx, m as fbs.Slider));
+    ZeroFlatRenderer.register(fbs.StacNodeTypeId.Alert,
+        (ctx, m) => AlertBuilder.build(ctx, m as fbs.Alert));
+    ZeroFlatRenderer.register(fbs.StacNodeTypeId.SelectGroup,
+        (ctx, m) => SelectGroupBuilder.build(ctx, m as fbs.SelectGroup));
+    ZeroFlatRenderer.register(fbs.StacNodeTypeId.Accordion,
+        (ctx, m) => AccordionBuilder.build(ctx, m as fbs.Accordion));
+    ZeroFlatRenderer.register(fbs.StacNodeTypeId.Breadcrumb,
+        (ctx, m) => BreadcrumbBuilder.build(ctx, m as fbs.Breadcrumb));
 
     ZeroFlatActionDispatcher.setOverlayHandler(ForuiOverlayHandler.handle);
   }

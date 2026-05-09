@@ -39,9 +39,9 @@ class ForuiOverlayHandler {
     final model = root.node as fbs.Dialog;
 
     if (!context.mounted) return;
-    await showAdaptiveDialog(
+    await showFDialog(
       context: context,
-      builder: (ctx) => DialogBuilder.build(ctx, model),
+      builder: (ctx, style, animation) => DialogBuilder.build(ctx, model),
     );
   }
 

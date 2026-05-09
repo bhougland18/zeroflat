@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:forui/forui.dart';
 import 'package:zeroflat/src/fbs.dart' as fbs;
-import 'package:zeroflat/src/renderer.dart';
+import 'package:zeroflat/zeroflat.dart';
 import 'package:zeroflat_forui/src/theme_registry.dart';
 
 class ThemeBuilder {

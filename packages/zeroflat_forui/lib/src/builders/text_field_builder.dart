@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:forui/forui.dart';
 import 'package:zeroflat/src/action_dispatcher.dart';
 import 'package:zeroflat/src/fbs.dart' as fbs;
-import 'package:zeroflat/src/renderer.dart';
+import 'package:zeroflat/zeroflat.dart';
 
 class TextFieldBuilder {
   static Widget build(BuildContext context, fbs.TextField model) {

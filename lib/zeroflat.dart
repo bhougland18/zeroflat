@@ -16,3 +16,4 @@ library;
 
 export 'src/renderer.dart';
 export 'src/action_dispatcher.dart';
+export 'src/bindings/bindings.dart';

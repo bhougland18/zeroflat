@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:forui/forui.dart';
 import 'package:zeroflat/src/fbs.dart' as fbs;
-import 'package:zeroflat/src/renderer.dart';
+import 'package:zeroflat/zeroflat.dart';
 
 class CardBuilder {
   static Widget build(BuildContext context, fbs.Card model) {

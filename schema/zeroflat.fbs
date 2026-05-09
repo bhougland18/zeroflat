@@ -23,6 +23,9 @@ enum ButtonVariant: ubyte { Primary = 0, Secondary, Outline, Destructive, Ghost 
 enum ButtonSize   : ubyte { Xs = 0, Sm, Md, Lg }
 enum ToastVariant : ubyte { Primary = 0, Destructive }
 enum SheetSide    : ubyte { Top = 0, Bottom, Left, Right }
+enum BadgeVariant : ubyte { Primary = 0, Secondary, Outline, Destructive }
+enum AlertVariant : ubyte { Primary = 0, Destructive }
+enum SelectGroupVariant : ubyte { Checkbox = 0, Radio }
 
 enum ColorToken : ubyte {
   Primary = 0,
@@ -71,6 +74,15 @@ union StacNode {
   Checkbox,
   Card,
   Dialog,
+  Badge,
+  Avatar,
+  Progress,
+  Tabs,
+  Slider,
+  Alert,
+  SelectGroup,
+  Accordion,
+  Breadcrumb,
 }
 
 // Dart's FlatBuffers codegen does not support vectors of unions ([StacNode]).
@@ -231,6 +243,103 @@ table Dialog {
   body:string;
   body_node:StacNode;
   axis:Axis = Vertical;
+}
+
+table Badge {
+  id:string (required);
+  label:string;
+  child:StacNode;
+  variant:BadgeVariant = Primary;
+}
+
+table Avatar {
+  id:string (required);
+  image_url:string;
+  fallback_label:string;
+  size:float = 40.0;
+}
+
+table Progress {
+  id:string (required);
+  value:float = -1.0; // -1.0 = indeterminate
+  label:string;
+}
+
+table Tab {
+  id:string (required);
+  label:string;
+  label_node:StacNode;
+  content:StacNode (required);
+}
+
+table Tabs {
+  id:string (required);
+  tabs:[Tab] (required);
+  initial_index:int = 0;
+  on_change:StacAction;
+}
+
+table Slider {
+  id:string (required);
+  value:float = 0.0;
+  label:string;
+  description:string;
+  on_change:StacAction;
+}
+
+table Alert {
+  id:string (required);
+  title:string;
+  title_node:StacNode;
+  subtitle:string;
+  subtitle_node:StacNode;
+  icon:StacNode;
+  variant:AlertVariant = Primary;
+}
+
+table SelectGroupItem {
+  id:string (required);
+  label:string;
+  label_node:StacNode;
+  description:string;
+  value:string (required);
+}
+
+table SelectGroup {
+  id:string (required);
+  items:[SelectGroupItem] (required);
+  values:[string]; // Selected values
+  label:string;
+  description:string;
+  variant:SelectGroupVariant = Radio;
+  on_change:StacAction;
+}
+
+table AccordionItem {
+  id:string (required);
+  title:string;
+  title_node:StacNode;
+  content:StacNode (required);
+  icon:StacNode;
+  initially_expanded:bool = false;
+}
+
+table Accordion {
+  id:string (required);
+  items:[AccordionItem] (required);
+}
+
+table BreadcrumbItem {
+  id:string (required);
+  label:string;
+  label_node:StacNode;
+  on_press:StacAction;
+  current:bool = false;
+}
+
+table Breadcrumb {
+  id:string (required);
+  items:[BreadcrumbItem] (required);
 }
 
 // ── Bridge envelopes ───────────────────────────────────────────────────────────
