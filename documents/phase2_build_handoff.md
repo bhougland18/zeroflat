@@ -139,27 +139,29 @@ Hub `main()` sends `login_view::build()` bytes via `UiUpdate` on startup, then e
 
 ---
 
-## 6. Patrol integration tests
+## 6. Widget tests (stable ids)
 
-`integration_test/stable_ids_test.dart` — three tests:
+`test/stable_ids_test.dart` — three tests, **all passing** (`just test-dart`):
 
 1. **Login screen** — pumps the full Login tree, asserts all 5 component ids are found
 2. **Settings screen** — pumps the Settings tree, asserts all 4 ids
 3. **Re-render stability** — pumps the same tree twice with a changed label; verifies `email-field` key survives
 
-Tests use Dart `*ObjectBuilder` classes to build FlatBuffers in-test. No Rinf bridge is needed — `_TestHost` parses bytes directly via `fbs.StacRoot(bytes)` and calls `ZeroFlatRenderer.buildNode`.
+Tests use Dart `*ObjectBuilder` classes to build FlatBuffers in-test. No Rinf bridge is needed — `_TestHost` parses bytes directly via `fbs.StacRoot(bytes)` and calls `ZeroFlatRenderer.buildNode`. Standard `testWidgets` / `WidgetTester` — no patrol dependency.
 
 **Run** (inside `nix develop`, after `just deps`):
 ```bash
-just test-integration
-# expands to: patrol test -d linux integration_test/stable_ids_test.dart
+just test-dart
+# expands to: flutter test  (picks up test/stable_ids_test.dart automatically)
 ```
+
+**Bug fixed during test run**: `SwitchBuilder` and `CheckboxBuilder` were using `ValueKey(model.id)` where `model.id` is a getter typed `String?`. Dart does not promote getter return types in null checks, so this produced `ValueKey<String?>` rather than `ValueKey<String>`, causing `find.byKey` to miss the widget. Fixed by extracting `final id = model.id` (a `String` local) before constructing the key — the same pattern all other builders use.
 
 ---
 
 ## 7. patrol_cli nix packaging
 
-`patrol_cli` is not in nixpkgs. It is built from source using `buildDartApplication`:
+`patrol_cli` is available in the devshell (built from source via `buildDartApplication`) but is not used by the test suite — Patrol 4.x dropped Linux desktop support and the widget tests run fine with plain `flutter test`. The nix derivation is kept for future use (e.g. real-device testing):
 
 - Feature file: `~/nix-config/devshells/features/flutter-patrol.nix`
 - Version: **4.3.1** (tag `patrol_cli-v4.3.1`)
@@ -178,6 +180,5 @@ To update to a new version see the comment block at the top of `flutter-patrol.n
 | Item | Notes |
 |------|-------|
 | `ActionShowSheet` | Stubbed in `overlays.dart` — `// Sheet routing — future work` |
-| `just test-integration` end-to-end | Not run yet; needs `just deps` inside devshell first |
 | Conduit dispatch in hub | `UiAction` receive loop is a placeholder |
-| Login/Settings mock screens in Dart (consuming app) | `d4h.1`/`.2` closed as Rust-side only; Dart side is `_TestHost` in integration tests |
+| Login/Settings mock screens in Dart (consuming app) | `d4h.1`/`.2` closed as Rust-side only; Dart side is `_TestHost` in widget tests |

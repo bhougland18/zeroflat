@@ -17,7 +17,7 @@ pub async fn main() {
     UiUpdate.send_signal_to_dart(bytes);
 
     // Listen for actions from Dart and log them (routing TBD when Conduit is wired).
-    let mut receiver = UiAction::get_dart_signal_receiver();
+    let receiver = UiAction::get_dart_signal_receiver();
     while let Some(signal) = receiver.recv().await {
         let _ = signal; // placeholder — Conduit dispatch goes here
     }

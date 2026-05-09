@@ -27,11 +27,6 @@ test-dart:
   flutter test
   flutter test packages/zeroflat_forui
 
-# Run Patrol integration tests on Linux desktop (no emulator needed)
-# First-time setup: dart pub global activate patrol_cli
-test-integration:
-  patrol test -d linux integration_test/stable_ids_test.dart
-
 # Run all tests
 test: test-rust test-dart
 

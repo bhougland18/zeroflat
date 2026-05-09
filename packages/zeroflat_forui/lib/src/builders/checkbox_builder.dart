@@ -4,8 +4,10 @@ import 'package:zeroflat/src/action_dispatcher.dart';
 import 'package:zeroflat/src/fbs.dart' as fbs;
 
 class CheckboxBuilder {
-  static Widget build(BuildContext context, fbs.Checkbox model) =>
-      _CheckboxWidget(model: model, key: model.id != null ? ValueKey(model.id) : null);
+  static Widget build(BuildContext context, fbs.Checkbox model) {
+    final id = model.id;
+    return _CheckboxWidget(model: model, key: id != null ? ValueKey(id) : null);
+  }
 }
 
 class _CheckboxWidget extends StatefulWidget {

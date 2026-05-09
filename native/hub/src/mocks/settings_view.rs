@@ -14,6 +14,7 @@ use zeroflat_fbs::fbs::zeroflat::{
 /// Tree: StacRoot → Scaffold
 ///   header  → Header ("Settings")
 ///   content → Card ("Preferences") → Switch (notifications-switch)
+#[allow(dead_code)]
 pub fn build() -> Vec<u8> {
     let mut fbb = FlatBufferBuilder::with_capacity(512);
 

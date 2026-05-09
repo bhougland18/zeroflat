@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forui/forui.dart';
-import 'package:integration_test/integration_test.dart';
-import 'package:patrol/patrol.dart';
 import 'package:zeroflat/src/fbs.dart' as fbs;
 import 'package:zeroflat/src/renderer.dart';
 import 'package:zeroflat_forui/zeroflat_forui.dart';
@@ -28,15 +26,13 @@ Widget _app(List<int> bytes) => MaterialApp(
     );
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
   setUpAll(() {
     ZeroFlatForui.register();
   });
 
   // ── Login screen ────────────────────────────────────────────────────────────
 
-  patrolTest('login screen — all component ids are stable', ($) async {
+  testWidgets('login screen — all component ids are stable', (tester) async {
     final bytes = fbs.StacRootObjectBuilder(
       schemaVersion: 1,
       nodeType: fbs.StacNodeTypeId.Scaffold,
@@ -64,7 +60,8 @@ void main() {
       ),
     ).toBytes();
 
-    await $.pumpWidgetAndSettle(_app(bytes));
+    await tester.pumpWidget(_app(bytes));
+    await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('login-scaffold')), findsOneWidget);
     expect(find.byKey(const ValueKey('login-header')), findsOneWidget);
@@ -75,7 +72,7 @@ void main() {
 
   // ── Settings screen ─────────────────────────────────────────────────────────
 
-  patrolTest('settings screen — all component ids are stable', ($) async {
+  testWidgets('settings screen — all component ids are stable', (tester) async {
     final bytes = fbs.StacRootObjectBuilder(
       schemaVersion: 1,
       nodeType: fbs.StacNodeTypeId.Scaffold,
@@ -99,7 +96,8 @@ void main() {
       ),
     ).toBytes();
 
-    await $.pumpWidgetAndSettle(_app(bytes));
+    await tester.pumpWidget(_app(bytes));
+    await tester.pumpAndSettle();
 
     expect(find.byKey(const ValueKey('settings-scaffold')), findsOneWidget);
     expect(find.byKey(const ValueKey('settings-header')), findsOneWidget);
@@ -110,7 +108,7 @@ void main() {
   // ── Re-render stability ─────────────────────────────────────────────────────
   // Pumping the same tree twice must produce the same keys (no re-keying on update).
 
-  patrolTest('login screen — keys survive re-render', ($) async {
+  testWidgets('login screen — keys survive re-render', (tester) async {
     fbs.StacRootObjectBuilder loginTree({String emailLabel = 'Email'}) =>
         fbs.StacRootObjectBuilder(
           schemaVersion: 1,
@@ -125,11 +123,13 @@ void main() {
           ),
         );
 
-    await $.pumpWidgetAndSettle(_app(loginTree().toBytes()));
+    await tester.pumpWidget(_app(loginTree().toBytes()));
+    await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('email-field')), findsOneWidget);
 
     // Simulate a server-driven update: same id, different label.
-    await $.pumpWidgetAndSettle(_app(loginTree(emailLabel: 'Email address').toBytes()));
+    await tester.pumpWidget(_app(loginTree(emailLabel: 'Email address').toBytes()));
+    await tester.pumpAndSettle();
     expect(find.byKey(const ValueKey('email-field')), findsOneWidget);
   });
 }

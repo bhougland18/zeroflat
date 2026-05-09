@@ -4,8 +4,10 @@ import 'package:zeroflat/src/action_dispatcher.dart';
 import 'package:zeroflat/src/fbs.dart' as fbs;
 
 class SwitchBuilder {
-  static Widget build(BuildContext context, fbs.Switch model) =>
-      _SwitchWidget(model: model, key: model.id != null ? ValueKey(model.id) : null);
+  static Widget build(BuildContext context, fbs.Switch model) {
+    final id = model.id;
+    return _SwitchWidget(model: model, key: id != null ? ValueKey(id) : null);
+  }
 }
 
 class _SwitchWidget extends StatefulWidget {
