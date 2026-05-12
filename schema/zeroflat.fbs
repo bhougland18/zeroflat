@@ -29,6 +29,7 @@ enum SelectGroupVariant : ubyte { Checkbox = 0, Radio }
 enum CellType : ubyte { Text = 0, Int, Float, Bool, Date, Null }
 enum SvgSourceType : ubyte { Asset = 0, Network, String, Memory }
 enum BoxFit : ubyte { Contain = 0, Cover, Fill, FitWidth, FitHeight, None, ScaleDown }
+enum FlowDelegateType : ubyte { RadialMenu = 0, SpeedDial }
 
 enum ColorToken : ubyte {
   Primary = 0,
@@ -89,6 +90,7 @@ union StacNode {
   VirtualList,
   WebView,
   Svg,
+  Flow,
 }
 
 // Dart's FlatBuffers codegen does not support vectors of unions ([StacNode]).
@@ -401,6 +403,34 @@ table VirtualList {
 table WebView {
   id:string (required);
   url:string (required);
+}
+
+// ── Flow — server-driven animated layouts ─────────────────────────────────────
+//
+// Rust declares the delegate type and parameters; Flutter animates entirely
+// client-side via AnimationController. Open/close state follows the
+// Switch/Checkbox pattern: local toggle with server override via didUpdateWidget.
+//
+// RadialMenu: children fan out from a center point across angle_sweep degrees
+//   starting at angle_start, at the given radius.
+// SpeedDial: children expand linearly along an axis with given spacing.
+
+table Flow {
+  id:string (required);
+  delegate:FlowDelegateType = RadialMenu;
+  trigger:StacNode;             // The button/FAB the user taps to open/close.
+  children:[NodeSlot];          // Items that animate out when open.
+  open:bool = false;            // Server can drive state; Flutter also toggles locally.
+  on_toggle:StacAction;         // Dispatched when the user taps the trigger.
+
+  // RadialMenu parameters
+  radius:float = 80.0;
+  angle_start:float = 270.0;   // Degrees. 0=right, 90=down, 180=left, 270=top (12 o'clock).
+  angle_sweep:float = 180.0;   // Degrees. 180=semicircle, 360=full circle.
+
+  // SpeedDial parameters
+  axis:Axis = Vertical;
+  spacing:float = 16.0;
 }
 
 // ── Svg — animated SVG via zeroflat_svg companion package ────────────────────
