@@ -6,6 +6,7 @@ import 'package:zeroflat_forui/src/builders/alert_builder.dart';
 import 'package:zeroflat_forui/src/builders/avatar_builder.dart';
 import 'package:zeroflat_forui/src/builders/badge_builder.dart';
 import 'package:zeroflat_forui/src/builders/breadcrumb_builder.dart';
+import 'package:zeroflat_forui/src/builders/flow_builder.dart';
 import 'package:zeroflat_forui/src/builders/progress_builder.dart';
 import 'package:zeroflat_forui/src/builders/button_builder.dart';
 import 'package:zeroflat_forui/src/builders/card_builder.dart';
@@ -70,6 +71,8 @@ class ZeroFlatForui {
         (ctx, m) => AccordionBuilder.build(ctx, m as fbs.Accordion));
     ZeroFlatRenderer.register(fbs.StacNodeTypeId.Breadcrumb,
         (ctx, m) => BreadcrumbBuilder.build(ctx, m as fbs.Breadcrumb));
+    ZeroFlatRenderer.register(fbs.StacNodeTypeId.Flow,
+        (ctx, m) => FlowBuilder.build(ctx, m as fbs.Flow));
 
     ZeroFlatActionDispatcher.setOverlayHandler(ForuiOverlayHandler.handle);
   }
