@@ -27,6 +27,8 @@ enum BadgeVariant : ubyte { Primary = 0, Secondary, Outline, Destructive }
 enum AlertVariant : ubyte { Primary = 0, Destructive }
 enum SelectGroupVariant : ubyte { Checkbox = 0, Radio }
 enum CellType : ubyte { Text = 0, Int, Float, Bool, Date, Null }
+enum SvgSourceType : ubyte { Asset = 0, Network, String, Memory }
+enum BoxFit : ubyte { Contain = 0, Cover, Fill, FitWidth, FitHeight, None, ScaleDown }
 
 enum ColorToken : ubyte {
   Primary = 0,
@@ -86,6 +88,7 @@ union StacNode {
   Breadcrumb,
   VirtualList,
   WebView,
+  Svg,
 }
 
 // Dart's FlatBuffers codegen does not support vectors of unions ([StacNode]).
@@ -398,6 +401,25 @@ table VirtualList {
 table WebView {
   id:string (required);
   url:string (required);
+}
+
+// ── Svg — animated SVG via zeroflat_svg companion package ────────────────────
+//
+// Rendered by zeroflat_svg (depends on full_svg_flutter ^1.1.1).
+// Static SVGs use FSvgPicture directly; animated SVGs use AnimatedSvgController
+// which can be driven by ActionSvgControl actions from Rust.
+// color_filter omitted from v1 — needs a typed FlatBuffer representation.
+
+table Svg {
+  id:string (required);
+  source:string (required);      // Asset path, network URL, raw SVG string, or memory key.
+  source_type:SvgSourceType = Asset;
+  width:float;                   // 0.0 = unconstrained.
+  height:float;                  // 0.0 = unconstrained.
+  fit:BoxFit = Contain;
+  auto_play:bool = true;
+  loop:bool = true;
+  playback_rate:float = 1.0;
 }
 
 // ── Bridge envelopes ───────────────────────────────────────────────────────────
